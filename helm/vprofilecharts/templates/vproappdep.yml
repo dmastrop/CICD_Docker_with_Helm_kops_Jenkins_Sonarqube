@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vproapp
+  labels: 
+    app: vproapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vproapp
+  template:
+    metadata:
+      labels:
+        app: vproapp
+    spec:
+      containers:
+      - name: vproapp
+        #image: vprofile/vprofileapp
+        # this is a dynamic value and the value will be passed from Jenkins (Jenkinsfile pipeline)
+        # Jenknsfile uses --set appimage=${registry}:${BUILD_NUMBER} in helm command during helm stage
+        # BUILD_NUMBER is jenkins pipeline number and registry is registry = "dave123456789/vproappdock" as in Jenkinsfile.
+        # So the image syntax will be dave123456789/vproappdock:<buildnumber>
+        image: {{ .Values.appimage}}
+        ports:
+        - name: vproapp-port
+          containerPort: 8080
+      initContainers:
+      - name: init-mydb
+        image: busybox
+        command: ['sh', '-c', 'until nslookup vprodb.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for mydb; sleep 2; done;']
+      - name: init-memcache
+        image: busybox
+        command: ['sh', '-c', 'until nslookup vprocache01.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for mydb; sleep 2; done;']
