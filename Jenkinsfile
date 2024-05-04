@@ -131,6 +131,9 @@ pipeline {
         stage('Kubernetes Deploy') {
 	        agent { label 'KOPS' }
             // the kops-project14-EC2 instance will be configured as a slave node to run the shell command below
+            // the label KOPS was used in the Jenkins slave node configuration for the kops-project14-EC2 instance along with a lot of other setup.
+            // Using SSH to the master to node connection. Security groups reprovisioned on AWS2.
+
             // Helm needs to be installed on the kops-project14-EC2 instance to run the charts from the source code and configure the k8s cluster
             // there is no helm plugin for Jenkins, but it is not required in this case anyways.
             // https://helm.sh/docs/intro/quickstart/
@@ -148,6 +151,9 @@ pipeline {
 
             //appimage variable will be passed into the vproappdep.yml file and referenced as {{ .Values.appimage}}
             // when Jenkinspipeline invokes helm command to provison the k8s cluster.
+
+            //created namespace as prod with kubectl create namespace prod
+            // charts will be deployed in prod namespace.
             
             steps {
                     sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
