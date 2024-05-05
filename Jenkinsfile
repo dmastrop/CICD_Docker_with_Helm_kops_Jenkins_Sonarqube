@@ -181,3 +181,6 @@ pipeline {
 
 }
 //Pipeline block end
+
+
+// first test of project20 from VSCode push and then pull to kops-project14-EC2 then push from kops-project14-EC2
