@@ -110,13 +110,30 @@ replicaset.apps/vprofile-stack-vprofilecharts-5f48d5d59c   1         1         1
 replicaset.apps/vpromc-5c65464866                          1         1         1       41s
 replicaset.apps/vpromq01-69b8ff77dc                        1         1         1       41s
 
+## remove the stack and proceed with production setup below
+helm delete vprofile-stack --namespace test
+
+
 
 
 
 
 # Production: 
 
-## Configure the kops-project14-EC2 instance as a slave node to the Jenkins server. Use SSH as the connection protocol.
+## Configure the kops-project14-EC2 instance as a slave node to the Jenkins server. Use SSH as the connection protocol.  
+Install OpenJDK 11 on the kops node.   
+Create a /opt/jenkins-slave directory. This will have the agent and workspace from jenkins on it
+Ubuntu user needs to own this directory. Jenkins will use ubuntu user to run the stage
+kops-project14-EC2 security group needs to be able to have inbound access from Jenkins (SSH), user ubunu
+Manage Jenkins ---> Node and add the node along with the SSH private key to the EC2 instance.
+Label and name is "KOPS" and must be used in the stage in the Jenkinsfile. See below
+Only use the agent for the stage explicitly specify it as agent
+Disable Host verification on the SSH for now.
+Test the connection from Jenkins. Launch the agent and it should come up.
+
+
+
+
 
 ## Prepare the Jenkinsfile. Stages for CI are BUILD, UNIT TEST, INTEGRATION TEST, CODE ANALYSIS WITH CHECKSTYLE, CODE ANALYSIS with SONARQUBE, and if Quality Gate (AG) passes:  DOCKER BUILD for the application artifact (.war in docker image), Deploy and upload to docker hub.   CD deploy to the kops cluster with helm from the slave node kops-project14-EC2 jenkins node similar to the example above but with the real docker image artifact build.  At this point selenium can be used to browser test the frontend and backend on a browser.  (Selenium is not implemented yet).   Messaging is to slack. Any failed build will cause the process to start again with developers fixing and rechecking in the code from the start of the CI pipeline.(re-triggering the pipeline)
 
@@ -147,11 +164,6 @@ stage('Kubernetes Deploy') {
 
 
 # For code administration and source control in general edit the code on VSCode locally on mac, push to remote repository and then pull the code to the slave node kops-project14-EC2 node so that the last stage can be executed on the node.
-
-
-
-
-
 
 
 
