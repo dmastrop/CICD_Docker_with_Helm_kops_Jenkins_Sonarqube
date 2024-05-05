@@ -1,3 +1,16 @@
+//COLOR_MAP for the post stages at the bottom
+// If SUCCESS then good which is green in slack app
+// If FAILURE then danger which is red in slack app
+// Thus we can color code the messages from slack
+
+def COLOR_MAP = [
+    'SUCCESS': 'good', 
+    'FAILURE': 'danger',
+]
+
+
+
+
 pipeline {
 //Nexus will not be used in this project
 
@@ -185,3 +198,5 @@ pipeline {
 
 // first test of project20 from VSCode push and then pull to kops-project14-EC2 then push from kops-project14-EC2
 // retest after adding webhook for the repo
+// git host key verification on agent was disabled but had to globally disable it for the last stage to work.
+//https://plugins.jenkins.io/git-client/#plugin-content-ssh-host-key-verification
