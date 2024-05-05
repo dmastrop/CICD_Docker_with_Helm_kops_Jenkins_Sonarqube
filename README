@@ -1,0 +1,188 @@
+# Overview:
+
+Project20: port CI w Jenkins Sonarqube but use docker hub. Containerize vprofile app on Jenkins pipeline: Build;unit test,;integ ;sonar test;QG; docker build/deploy to hub; kops EC2 instance as Jenkins slave NODE to deploy full stack and docker image vprofile app from docker hub to the kops k8s cluster.Helm full stack deployed:rabbitmq,db;memcached and the application itself running on tomcat pod.
+
+Most of the Jenkinsfile will be executed on the Jenkins server. Since the docker image needs to be built from source code, docker engine has to be installed onto Jenkins server
+
+The last stage will be run on the kops-project14-EC2 instance that has kubectl, kops, and helm installed.
+This EC2 instance will provision the helm template files onto the kops cluster as noted above.
+
+The kops-project14-EC2 instance has aws cli configured and the aws configuration is with an Admin AWS user.
+
+This is using AWS2 account
+
+Provision this on us-east-1
+
+
+
+
+
+# Basic staging flow for bringing up the CICD setup with kops, Jenkins, Sonarqube, Helm with docker container for the application (full stack implemented with backend server containers):
+
+## Bring up the kops cluster from the kops-project14-EC2 instance
+Name: kops-project14.**************.com
+S3:  vprofile-kops-s3-state-project14
+
+Create config cluster: 
+kops create cluster --name=kops-project14.******************.com \
+--state=s3://vprofile-kops-s3-state-project14 --zones=us-east-1a,us-east-1b \
+--node-count=2 --node-size=t3.small --master-size=t3.medium --dns-zone=kops-project14.************.com \
+--node-volume-size=8 --master-volume-size=8 --ssh-public-key=~/.ssh/kops-key-project14.pub
+
+Deploy cluster:
+kops update cluster --name=kops-project14.*****************.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin
+
+
+
+$ kops validate cluster --state=s3://vprofile-kops-s3-state-project14
+Using cluster from kubectl context: kops-project14.******************.com
+
+Validating cluster kops-project14.**********************.com
+
+INSTANCE GROUPS
+NAME                            ROLE            MACHINETYPE     MIN     MAX     SUBNETS
+control-plane-us-east-1a        ControlPlane    t3.medium       1       1       us-east-1a
+nodes-us-east-1a                Node            t3.small        1       1       us-east-1a
+nodes-us-east-1b                Node            t3.small        1       1       us-east-1b
+
+NODE STATUS
+NAME                    ROLE            READY
+i-06900f5ecacbc4430     node            True
+i-0c2e6341778830d30     control-plane   True
+i-0e4c27dff6605359a     node            True
+
+ssh -i ~/.ssh/kops-key-project14 ubuntu@api.kops-project14.***************.com
+
+Delete cluster:
+kops delete cluster --name= kops-project14.*********************.com --state=s3://vprofile-kops-s3-state-project14 --yes
+
+
+
+
+## Test the helm chart deployment with namespace test
+
+kubectl create namespace test
+
+From the local git repository on the kops-project14-EC2 instance (do a git pull from remote github repo for latest source code) run the following command to deploy the helm template files form db, memcached, rabbitmq, the vprofile app on tomcat
+
+The docker image is a test image for now.  For production this will be built and uploaded to my own docker hub repository
+
+in vproappdep.yml use the dynamic image image: {{ .Values.appimage}} so that helm can pick up the latest docker image from the repository
+
+In production, appimage will be defined as my latest build docker image on my repository (dynamic). For now we are using a test image.
+
+$ helm install --namespace test vprofile-stack helm/vprofilecharts --set appimage=imranvisualpath/vproappdock:9
+
+ubuntu@ip-172-31-88-11:~/CICD_Docker_with_Helm_kops_Jenkins_Sonarqube$ kubectl get secret -n test
+NAME                                   TYPE                 DATA   AGE
+app-secret                             Opaque               2      18m
+sh.helm.release.v1.vprofile-stack.v1   helm.sh/release.v1   1      18m
+
+
+## Full stack for the application is deployed below on the kops cluster
+
+$ kubectl get all --namespace test
+NAME                                                 READY   STATUS    RESTARTS   AGE
+pod/vproapp-7595664b84-plwmr                         1/1     Running   0          41s
+pod/vprodb-849f57645b-tmh24                          1/1     Running   0          41s
+pod/vprofile-stack-vprofilecharts-5f48d5d59c-g5kht   1/1     Running   0          41s
+pod/vpromc-5c65464866-scmsr                          1/1     Running   0          41s
+pod/vpromq01-69b8ff77dc-tnfpk                        1/1     Running   0          41s
+
+NAME                                    TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)        AGE
+service/vproapp-service                 LoadBalancer   100.70.117.109   afbba37dba31240e8b9827de54c23f43-1689472808.us-east-1.elb.amazonaws.com   80:31939/TCP   41s
+service/vprocache01                     ClusterIP      100.66.83.132    <none>                                                                    11211/TCP      41s
+service/vprodb                          ClusterIP      100.70.28.103    <none>                                                                    3306/TCP       41s
+service/vprofile-stack-vprofilecharts   ClusterIP      100.71.161.13    <none>                                                                    80/TCP         41s
+service/vpromq01                        ClusterIP      100.71.99.201    <none>                                                                    5672/TCP       41s
+
+NAME                                            READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/vproapp                         1/1     1            1           41s
+deployment.apps/vprodb                          1/1     1            1           41s
+deployment.apps/vprofile-stack-vprofilecharts   1/1     1            1           41s
+deployment.apps/vpromc                          1/1     1            1           41s
+deployment.apps/vpromq01                        1/1     1            1           41s
+
+NAME                                                       DESIRED   CURRENT   READY   AGE
+replicaset.apps/vproapp-7595664b84                         1         1         1       41s
+replicaset.apps/vprodb-849f57645b                          1         1         1       41s
+replicaset.apps/vprofile-stack-vprofilecharts-5f48d5d59c   1         1         1       41s
+replicaset.apps/vpromc-5c65464866                          1         1         1       41s
+replicaset.apps/vpromq01-69b8ff77dc                        1         1         1       41s
+
+
+
+
+
+# Production: 
+
+## Configure the kops-project14-EC2 instance as a slave node to the Jenkins server. Use SSH as the connection protocol.
+
+## Prepare the Jenkinsfile. Stages for CI are BUILD, UNIT TEST, INTEGRATION TEST, CODE ANALYSIS WITH CHECKSTYLE, CODE ANALYSIS with SONARQUBE, and if Quality Gate (AG) passes:  DOCKER BUILD for the application artifact (.war in docker image), Deploy and upload to docker hub.   CD deploy to the kops cluster with helm from the slave node kops-project14-EC2 jenkins node similar to the example above but with the real docker image artifact build.  At this point selenium can be used to browser test the frontend and backend on a browser.  (Selenium is not implemented yet).   Messaging is to slack. Any failed build will cause the process to start again with developers fixing and rechecking in the code from the start of the CI pipeline.(re-triggering the pipeline)
+
+Jenkins and sonarqube server need access to each other in security groups.
+Jenkins needs access to the slave node kops-project14-EC2 instance security group.
+The registry will be defined in the Jenkinsfile (my docker hub account and the name of the image)
+registryCredential is stored as secret on Jenkins has the password to my docker hub account
+appimage will be set by the helm command based upon the docker image created in earlier stages (registry and BUILD_NUMBER will serve as the tag on the image for the lastest build that has passed testing)
+
+## create a prod namespace: kubectl create namespace prod
+
+## create the pipeline on Jenkins with trigger from this repository which is on github.
+
+## As noted above messaging is via a slack channel. Any failure will cause a notification and the pipeline will have to be restarted with another check in from development to fix the code.
+
+## The Jenkinsfile last stage is the helm command below executed from the root of the repository that has the src and helm directories.  KOPS is the name and label configured for the slave node on Jenkins server for the kops-project14-EC2 instance that is executing the stage below.
+
+stage('Kubernetes Deploy') {
+	        agent { label 'KOPS' }
+
+            
+            steps {
+                    sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
+            }
+        }
+
+
+
+
+# For code administration and source control in general edit the code on VSCode locally on mac, push to remote repository and then pull the code to the slave node kops-project14-EC2 node so that the last stage can be executed on the node.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## Prerequisites
+- JDK 1.8 or later
+- Maven 3 or later
+- MySQL 5.6 or later
+
+## Technologies 
+- Spring MVC
+- Spring Security
+- Spring Data JPA
+- Maven
+- JSP
+- MySQL
+## Database
+Here,we used Mysql DB 
+MSQL DB Installation Steps for Linux ubuntu 14.04:
+- $ sudo apt-get update
+- $ sudo apt-get install mysql-server
+
+Then look for the file :
+- /src/main/resources/accountsdb
+- accountsdb.sql file is a mysql dump file.we have to import this dump to mysql db server
+- > mysql -u <user_name> -p accounts < accountsdb.sql
+
+
