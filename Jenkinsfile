@@ -171,8 +171,10 @@ pipeline {
             
           steps {
             script {
+              sh "set +e"
               sh "kubectl delete namespace prod"
               sh "kubectl create namespace prod"
+              sh "set -e"
               //returnStatus: true
               // command || true // this exits with code 1 (true)
               //command || exit 0
