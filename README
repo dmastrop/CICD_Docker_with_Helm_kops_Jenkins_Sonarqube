@@ -186,16 +186,11 @@ stage('Kubernetes Deploy') {
 This code below will ensure that the namespace will be present prior to running the helm command above, regardless if the namespace is there already (from previous run), or if it is not there (first run)
 
 steps {
-            script {
-              sh "kubectl delete namespace prod || exit 0"
-              //exit 0 regardless of kubectl create namespce prod. If it already exists the script still exits with 0 
-              // so Jenkins does not abort the script
-            }
-
+            
             script {
               // do the same for the create namespace. If this is a second run the namespace will already be there 
               // this will throw an Already Exists error and the shell script will exit with 1. Force it to exit with 0
-              // This is not needed here because kubectl will delete the namespace above, always for each run.  But leave it in for now.
+
               sh "kubectl create namespace prod || exit 0"
             }
 

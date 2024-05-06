@@ -230,3 +230,4 @@ pipeline {
 // git host key verification on agent was disabled but had to globally disable it for the last stage to work.
 //https://plugins.jenkins.io/git-client/#plugin-content-ssh-host-key-verification
 // test with no helm stack on there and no namespace
+// testing second run with || exit 0 on the create namespace
