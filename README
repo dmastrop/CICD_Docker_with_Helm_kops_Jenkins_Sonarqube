@@ -186,18 +186,23 @@ stage('Kubernetes Deploy') {
 This code below will ensure that the namespace will be present prior to running the helm command above, regardless if the namespace is there already (from previous run), or if it is not there (first run)
 The try-catch block will add the namespace if not present (no error thrown), or if the namespace is there the error message will print out in Jenkins logs but the script will not abort.  This is in lieu of using kubectl create namespace prod || exit 0 so that the exact error can be seen in the logs....
 
-steps {
-            
-            script {
-              // do the same for the create namespace. If this is a second run the namespace will already be there 
-              // this will throw an Already Exists error and the shell script will exit with 1. Force it to exit with 0
 
-              sh "kubectl create namespace prod || exit 0"
-            }
+
+script { 
+
+              try { 
+                sh "kubectl create namespace prod"
+              }    
+              catch (e) { 
+                    echo "An error occurred: ${e}" 
+              } 
+            } 
+            
 
             sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
           }
-        }
+        
+
 
 
 
