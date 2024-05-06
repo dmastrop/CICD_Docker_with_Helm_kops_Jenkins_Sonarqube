@@ -171,8 +171,8 @@ pipeline {
             
           steps {
             script {
-              sh "kubectl delete namespace prod" || exit 0
-              sh "kubectl create namespace prod" || exit 0
+              sh "kubectl delete namespace prod || exit 0"
+              //sh "kubectl create namespace prod || exit 0"
               //returnStatus: true
               // command || true // this exits with code 1 (true)
               //command || exit 0
@@ -180,6 +180,7 @@ pipeline {
               //exit 0 regardless of kubectl create namespce prod. If it already exists the script still exists with 0 
               // so Jenkins does not abort the script
             }
+            sh "kubectl create namespace prod"
             sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
           }
         }
