@@ -181,22 +181,22 @@ pipeline {
             //   // so Jenkins does not abort the script
             // }
 
-            script {
-              // do the same for the create namespace. If this is a second run the namespace will already be there 
-              // this will throw an Already Exists error and the shell script will exit with 1. Force it to exit with 0
-              sh "kubectl create namespace prod || exit 0"
-            }
+            // script {
+            //   // do the same for the create namespace. If this is a second run the namespace will already be there 
+            //   // this will throw an Already Exists error and the shell script will exit with 1. Force it to exit with 0
+            //   sh "kubectl create namespace prod || exit 0"
+            // }
 
-            // // change the above to a try-catch  block so error is shown in jenkins log
-            // script { 
+            // change the above kubectl create block to a try-catch  block so error is shown in jenkins log
+            script { 
 
-            //   try { 
-            //     sh 'test_script.sh' 
-            //   }    
-            //   catch (e) { 
-            //         echo "An error occurred: ${e}" 
-            //   } 
-            // } 
+              try { 
+                sh "kubectl create namespace prod || exit 0"
+              }    
+              catch (e) { 
+                    echo "An error occurred: ${e}" 
+              } 
+            } 
             
 
             sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
