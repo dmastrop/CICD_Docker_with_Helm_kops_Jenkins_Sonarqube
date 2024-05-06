@@ -175,7 +175,8 @@ pipeline {
               sh "kubectl create namespace prod"
               //returnStatus: true
               // command || true // this exits with code 1 (true)
-              command || exit 0
+              //command || exit 0
+              command || false
               //exit 0 regardless of kubectl create namespce prod. If it already exists the script still exists with 0 
               // so Jenkins does not abort the script
             }
