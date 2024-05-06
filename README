@@ -188,7 +188,7 @@ The try-catch block will add the namespace if not present (no error thrown), or 
 
 
 
-script { 
+            script { 
 
               try { 
                 sh "kubectl create namespace prod"
@@ -200,7 +200,7 @@ script {
             
 
             sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
-          }
+          
         
 
 
