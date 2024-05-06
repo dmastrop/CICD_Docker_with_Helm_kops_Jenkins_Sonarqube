@@ -184,6 +184,7 @@ stage('Kubernetes Deploy') {
 
 ## To automate things further I added the kubectl create namespace prod to the Jenkinsfile itself.
 This code below will ensure that the namespace will be present prior to running the helm command above, regardless if the namespace is there already (from previous run), or if it is not there (first run)
+The try-catch block will add the namespace if not present (no error thrown), or if the namespace is there the error message will print out in Jenkins logs but the script will not abort.  This is in lieu of using kubectl create namespace prod || exit 0 so that the exact error can be seen in the logs....
 
 steps {
             
