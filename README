@@ -73,13 +73,21 @@ In production, appimage will be defined as my latest build docker image on my re
 
 $ helm install --namespace test vprofile-stack helm/vprofilecharts --set appimage=imranvisualpath/vproappdock:9
 
-ubuntu@ip-172-31-88-11:~/CICD_Docker_with_Helm_kops_Jenkins_Sonarqube$ kubectl get secret -n test
+$ kubectl get secret -n test
 NAME                                   TYPE                 DATA   AGE
 app-secret                             Opaque               2      18m
 sh.helm.release.v1.vprofile-stack.v1   helm.sh/release.v1   1      18m
 
 
+helm delete vprofile-stack --namespace test
+
+
+
+
 ## Full stack for the application is deployed below on the kops cluster
+
+helm list --namespace prod
+
 
 $ kubectl get all --namespace test
 NAME                                                 READY   STATUS    RESTARTS   AGE
@@ -112,6 +120,19 @@ replicaset.apps/vpromq01-69b8ff77dc                        1         1         1
 
 ## remove the stack and proceed with production setup below
 helm delete vprofile-stack --namespace test
+
+
+## Other commands
+
+kubctl get pods --namespace prod
+
+To verify the vprofile app version do:
+kubectl describe pod vproapp-7595664b84-plwmr --namepace prod
+
+To get the loadbalancer frontend URL:
+kubectl get service -namespace prod
+
+
 
 
 
