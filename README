@@ -35,6 +35,7 @@ kops update cluster --name=kops-project14.*****************.com --state=s3://vpr
 
 
 $ kops validate cluster --state=s3://vprofile-kops-s3-state-project14
+
 Using cluster from kubectl context: kops-project14.******************.com
 
 Validating cluster kops-project14.**********************.com
