@@ -189,6 +189,7 @@ pipeline {
 
             // change the above kubectl create block to a try-catch  block so error is shown in jenkins log
             // "kubectl create namespace prod || exit 0"
+            // the || exit 0 is no longer needed. If there is an error (1) the error will print out but the script will NOT abort the pipeline
             script { 
 
               try { 
