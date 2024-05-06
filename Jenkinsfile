@@ -235,3 +235,4 @@ pipeline {
 // testing second run with || exit 0 on the create namespace
 // testing with try-catch block
 // testing
+// testing try-catch block
