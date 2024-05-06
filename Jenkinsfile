@@ -174,7 +174,10 @@ pipeline {
               
               sh "kubectl create namespace prod"
               //returnStatus: true
-              command || true
+              // command || true // this exits with code 1 (true)
+              command || exit 0
+              //exit 0 regardless of kubectl create namespce prod. If it already exists the script still exists with 0 
+              // so Jenkins does not abort the script
             }
             sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
           }
