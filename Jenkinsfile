@@ -171,7 +171,7 @@ pipeline {
             
           steps {
             script {
-              returnStatus: true
+              returnStatus: true,
               sh "kubectl create namespace prod"
             }
             sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
