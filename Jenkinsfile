@@ -188,10 +188,11 @@ pipeline {
             // }
 
             // change the above kubectl create block to a try-catch  block so error is shown in jenkins log
+            // "kubectl create namespace prod || exit 0"
             script { 
 
               try { 
-                sh "kubectl create namespace prod || exit 0"
+                sh "kubectl create namespace prod"
               }    
               catch (e) { 
                     echo "An error occurred: ${e}" 
