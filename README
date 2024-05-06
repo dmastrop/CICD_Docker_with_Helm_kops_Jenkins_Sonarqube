@@ -160,13 +160,59 @@ stage('Kubernetes Deploy') {
             }
         }
 
+## To automate things further I added the kubectl create namespace prod to the Jenkinsfile itself.
+This code below will ensure that the namespace will be present prior to running the helm command above, regardless if the namespace is there already (from previous run), or if it is not there (first run)
+
+steps {
+            script {
+              sh "kubectl delete namespace prod || exit 0"
+              //exit 0 regardless of kubectl create namespce prod. If it already exists the script still exits with 0 
+              // so Jenkins does not abort the script
+            }
+
+            script {
+              // do the same for the create namespace. If this is a second run the namespace will already be there 
+              // this will throw an Already Exists error and the shell script will exit with 1. Force it to exit with 0
+              // This is not needed here because kubectl will delete the namespace above, always for each run.  But leave it in for now.
+              sh "kubectl create namespace prod || exit 0"
+            }
+
+            sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
+          }
+        }
+
+
+
+## For sonarqube, I created a new project on the sonarqube server. The projectKey and projectName are the only chnages in the Jenkinsfile script. sonarserver and sonarscanner are the same on Jenkins server configuration as well as the jenkinstosonar token.  NOTE: for QG (QualityGate) status create a webhook on the sonarqube server for sonartojenkins communication so that sonarqube server can update Jenkins with QG results.
+
+
+environment {
+                scannerHome = tool 'sonarscanner'
+            }
+
+            steps {
+                withSonarQubeEnv('sonarserver') {
+                    sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonar-project20 \
+                   -Dsonar.projectName=vprofile-repo-project20 \
+                   -Dsonar.projectVersion=1.0 \
+                   -Dsonar.sources=src/ \
+                   -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
+                   -Dsonar.junit.reportsPath=target/surefire-reports/ \
+                   -Dsonar.jacoco.reportsPath=target/jacoco.exec \
+                   -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml'''
+                }
+
+
+
+
+
 
 
 
 # For code administration and source control in general edit the code on VSCode locally on mac, push to remote repository and then pull the code to the slave node kops-project14-EC2 node so that the last stage can be executed on the node.
 
-
-
+## NOTE: the kops-project14-EC2 node actually will fetch the code each time the pipeline runs and put it in the opt/jenkins-slave/workspace directory.  So the pull into the /home/ubuntu directory is not necessary.
+To fetch the code SSH host verification on the node configuration in Jenkins should be none.  Also I found that the global Security Jenkins setting had to be set at SSH host verification none for this pipeline to work.   Otherwise there were failures in getting the source code from github repo.
 
 
 
