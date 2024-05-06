@@ -79,6 +79,8 @@ pipeline {
         stage('CODE ANALYSIS with SONARQUBE') {
             // my SONARSCANNER is sonarscanner as defined in Jenkins Tools
             // my SONARSERVER is sonarserver as defined in Jenkins System
+            // original projectKey= vprofile
+            // original projectName=vprofile-repo
 
             environment {
                 scannerHome = tool 'sonarscanner'
@@ -86,8 +88,8 @@ pipeline {
 
             steps {
                 withSonarQubeEnv('sonarserver') {
-                    sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=vprofile \
-                   -Dsonar.projectName=vprofile-repo \
+                    sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonar-project20 \
+                   -Dsonar.projectName=vprofile-repo-project20 \
                    -Dsonar.projectVersion=1.0 \
                    -Dsonar.sources=src/ \
                    -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
