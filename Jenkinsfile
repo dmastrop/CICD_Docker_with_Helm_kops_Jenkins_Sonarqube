@@ -107,7 +107,7 @@ pipeline {
         }
 
 
-        stage("SONARQUBE Quality Gate relay back to Jenkins") {
+        stage('SONARQUBE Quality Gate relay back to Jenkins') {
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
                     // timeout after 1 hour if the plugin below does not respond
