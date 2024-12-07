@@ -20,7 +20,9 @@ pipeline {
     // to provision the k8s cluster on AWS2
 /*
 	tools {
-        maven "maven3"
+    //maven "maven3"
+	maven "MAVEN3_9"
+	jdk "OracleJDK17"    
     }
 */
     environment {
@@ -83,12 +85,12 @@ pipeline {
             // original projectName=vprofile-repo
 
             environment {
-                scannerHome = tool 'sonarscanner'
+                scannerHome = tool 'sonarscanner1'
             }
 
             steps {
-                withSonarQubeEnv('sonarserver') {
-                    sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=sonar-project20 \
+                withSonarQubeEnv('sonarserver1') {
+                    sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=vprofile-repo-project20 \
                    -Dsonar.projectName=vprofile-repo-project20 \
                    -Dsonar.projectVersion=1.0 \
                    -Dsonar.sources=src/ \
@@ -98,7 +100,23 @@ pipeline {
                    -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml'''
                 }
 
+               // timeout(time: 10, unit: 'MINUTES') {
+               // waitForQualityGate abortPipeline: true
+               // }
+            }
+        }
+
+
+        stage("SONARQUBE Quality Gate relay back to Jenkins") {
+            steps {
                 timeout(time: 10, unit: 'MINUTES') {
+                    // timeout after 1 hour if the plugin below does not respond
+
+                    // Parameter indicates whether to set pipeline to UNSTABLE if Quality Gate fails
+                    // true = set pipeline to UNSTABLE, false = don't
+                    // Quality Gate for this vprofile project is vprofileQG
+                    // the sonarqubetojenkins webhook is http://172.31.25.39:8080/sonarqube-webhook and has been
+                    // atached to the vprofile project in sonarqube.
                     waitForQualityGate abortPipeline: true
                 }
             }
