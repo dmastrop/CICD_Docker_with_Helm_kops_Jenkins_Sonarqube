@@ -2,7 +2,7 @@
 // If SUCCESS then good which is green in slack app
 // If FAILURE then danger which is red in slack app
 // Thus we can color code the messages from slack
-// test18
+// test19
 
 def COLOR_MAP = [
     'SUCCESS': 'good', 
