@@ -250,7 +250,7 @@ On Jenkins a token needs to be generated for the jenkins to gitlab connection us
 
 In Jenkins project select pipeline script from SCM and configure the SCM to point to the gitlab repository/docker container instance on the VPS.  Note the jenkins server has to be added to the VPS traefik whitelist so that jenkins traffic can be accepted into the VPS and routed to the gitlab docker container on the VPS
 The SCM configuration requires special configuration with ssh to the gitlab repo via git because VPS uses nonstandard SSH port.
-The git URL syntax is the following: ssh://git@gitlab.linode.cloudnetworktesting.com:44822/dmastrop/gitlab_to_jenkins_vprofile_project20c.git
+The git URL syntax is the following: ssh://git@gitlab.linode.cloudnetworktesting.com:*****/dmastrop/gitlab_to_jenkins_vprofile_project20c.git
 
 Configure the SSH private VPS key as a credential on jenkins so that it can be used in the SCM configuration above
 
