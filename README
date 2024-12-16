@@ -19,7 +19,7 @@ Provision this on us-east-1
 
 # Basic staging flow for bringing up the CICD setup with kops, Jenkins, Sonarqube, Helm with docker container for the application (full stack implemented with backend server containers):
 
-## Bring up the kops cluster from the kops-project14-EC2 instance
+## Bring up the kops cluster from the kops-project14-EC2 instance (jenkins agent/slave node)
 Name: kops-project14.**************.com
 S3:  vprofile-kops-s3-state-project14
 
