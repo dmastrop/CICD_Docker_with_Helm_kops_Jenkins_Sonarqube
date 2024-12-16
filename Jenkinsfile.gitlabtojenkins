@@ -186,7 +186,7 @@ pipeline {
                 script {
                 
                     sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14 --name=kops-project14.holinessinloveofchrist.com &> output.txt"
-                    sh "last_line=$(tail -n 1 output.txt)"
+                    sh "last_line=\$(tail -n 1 output.txt)"
                     sh "echo $last_line"
                     sh "export validatekops="$last_line""
                     sh "echo $validatekops"
