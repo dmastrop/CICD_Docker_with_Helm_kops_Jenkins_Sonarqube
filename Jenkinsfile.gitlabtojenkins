@@ -170,6 +170,7 @@ pipeline {
                 sleep 30
                 sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
                 sleep 360
+                sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
             }
         }
 
