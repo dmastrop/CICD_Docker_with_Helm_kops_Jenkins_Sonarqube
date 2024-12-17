@@ -185,7 +185,7 @@ pipeline {
                 sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
                 sleep 20    
                 //failure here means that the cluster already exits so proceed to next stage for helm deployment of new code
-                exit 0
+                sh "exit 0"
      
               } 
 
