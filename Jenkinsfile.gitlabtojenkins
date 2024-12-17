@@ -213,7 +213,7 @@ pipeline {
                 sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
                 sleep 360
                 //deploy helm chart on new cluster only if it has not already been deployed as this takes a lot of time
-                // It will only reach this stage if the cluster has not been deployed due to the "return" in the previous try/catch above
+                // It will only reach this part of the stage if the cluster has not been deployed due to the "return" in the previous try/catch above
                 script { 
 
                   try { 
