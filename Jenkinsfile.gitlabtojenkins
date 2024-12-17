@@ -200,7 +200,10 @@ pipeline {
                 
 
                 sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
-                sh "exit 0"
+                //exit this stage but keep currentBuild.result success to continue the pipeline
+                currentBuild.result = 'SUCCESS'
+                return
+
                 
               } 
 
@@ -209,6 +212,18 @@ pipeline {
               try {
                 sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
                 sleep 360
+                //deploy helm chart on new cluster
+                script { 
+
+                  try { 
+                    sh "kubectl create namespace prod"
+                  }    
+                  catch (e1) { 
+                        echo "An error occurred: ${e1}" 
+                  } 
+                } 
+                
+                sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
               }  
               catch (e) { 
                 echo "An error occurred: ${e}"                
