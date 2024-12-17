@@ -249,30 +249,42 @@ pipeline {
           }
         }        
 
-        //Try to automate the kops setup by putting in a large delay in the shell script after each command. Otherwise
-        //write code for the kops validate cluster command and parse out if up or not
-        stage('Kops setup') {
-          agent { label 'KOPS' }
-          steps {
-            script {
-              try {
-                sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14 --name=kops-project14.holinessinloveofchrist.com" 
-                sh "kops create cluster --name=kops-project14.holinessinloveofchrist.com \
---state=s3://vprofile-kops-s3-state-project14 --zones=us-east-1a,us-east-1b \
---node-count=2 --node-size=t3.small --master-size=t3.medium --dns-zone=kops-project14.holinessinloveofchrist.com \
---node-volume-size=8 --master-volume-size=8 --ssh-public-key=~/.ssh/kops-key-project14.pub"
-                sleep 30
-                sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
-                sleep 360
-                sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
-                sleep 20
-              }  
-              catch (e) { 
-                echo "An error occurred: ${e}" 
-              } 
-            }
-          }
-        }
+
+//         //Try to automate the kops setup by putting in a large delay in the shell script after each command. Otherwise
+//         //write code for the kops validate cluster command and parse out if up or not
+//         stage('Kops setup') {
+//           agent { label 'KOPS' }
+//           steps {
+//             script {
+//               try {
+//                 sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14 --name=kops-project14.holinessinloveofchrist.com" 
+//                 sh "kops create cluster --name=kops-project14.holinessinloveofchrist.com \
+// --state=s3://vprofile-kops-s3-state-project14 --zones=us-east-1a,us-east-1b \
+// --node-count=2 --node-size=t3.small --master-size=t3.medium --dns-zone=kops-project14.holinessinloveofchrist.com \
+// --node-volume-size=8 --master-volume-size=8 --ssh-public-key=~/.ssh/kops-key-project14.pub"
+//                 sleep 30
+//                 sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
+//                 sleep 360
+//                 sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
+//                 sleep 20
+//               }  
+//               catch (e) { 
+//                 echo "An error occurred: ${e}" 
+//               } 
+//             }
+//           }
+//         }
+
+
+
+
+
+
+
+
+
+
+
 
 //         //Try to automate the kops setup by putting in a large delay in the shell script after each command. Otherwise
 //         //write code for the kops validate cluster command and parse out if up or not
@@ -332,68 +344,75 @@ pipeline {
 //         }
 
 
-        // KUBERNETES:
-        stage('Kubernetes Deploy') {
-	        agent { label 'KOPS' }
-          // the kops-project14-EC2 instance will be configured as a slave node to run the shell command below
-          // the label KOPS was used in the Jenkins slave node configuration for the kops-project14-EC2 instance along with a lot of other setup.
-          // Using SSH to the master to node connection. Security groups reprovisioned on AWS2.
 
-          // Helm needs to be installed on the kops-project14-EC2 instance to run the charts from the source code and configure the k8s cluster
-          // there is no helm plugin for Jenkins, but it is not required in this case anyways.
-          // https://helm.sh/docs/intro/quickstart/
-          // https://helm.sh/docs/intro/install/
-          // https://helm.sh/docs/intro/quickstart/#initialize-a-helm-chart-repository
-          // https://github.com/helm/helm/releases
-          // Note that we are bringing up the k8s infra (1 master and 2 worker nodes) by using kops command line from this kops-project14-EC2 instance
-          // This can be automated by we are doing it manually for this project
-          // the kops commands for this setup are in the README file.  The s3 bucket is on AWS2 us-east-1 region vprofile-kops-s3-state-project14
-          // the cluster name is kops-project14.********.com (my own public domain)
-          // very that the hosted zone is up and running prior to running the kops, in Route53
-          // the kops public private key pair (rsa-gen) are in the ~/.ssh directory on the kops-project14-EC2 instance
-          // Include the public key in the kops create cluster command if you wish to SSH into the master/nodes once the infra is up.
+
+
+
+
+
+
+        // // KUBERNETES:
+        // stage('Kubernetes Deploy') {
+	    //     agent { label 'KOPS' }
+        //   // the kops-project14-EC2 instance will be configured as a slave node to run the shell command below
+        //   // the label KOPS was used in the Jenkins slave node configuration for the kops-project14-EC2 instance along with a lot of other setup.
+        //   // Using SSH to the master to node connection. Security groups reprovisioned on AWS2.
+
+        //   // Helm needs to be installed on the kops-project14-EC2 instance to run the charts from the source code and configure the k8s cluster
+        //   // there is no helm plugin for Jenkins, but it is not required in this case anyways.
+        //   // https://helm.sh/docs/intro/quickstart/
+        //   // https://helm.sh/docs/intro/install/
+        //   // https://helm.sh/docs/intro/quickstart/#initialize-a-helm-chart-repository
+        //   // https://github.com/helm/helm/releases
+        //   // Note that we are bringing up the k8s infra (1 master and 2 worker nodes) by using kops command line from this kops-project14-EC2 instance
+        //   // This can be automated by we are doing it manually for this project
+        //   // the kops commands for this setup are in the README file.  The s3 bucket is on AWS2 us-east-1 region vprofile-kops-s3-state-project14
+        //   // the cluster name is kops-project14.********.com (my own public domain)
+        //   // very that the hosted zone is up and running prior to running the kops, in Route53
+        //   // the kops public private key pair (rsa-gen) are in the ~/.ssh directory on the kops-project14-EC2 instance
+        //   // Include the public key in the kops create cluster command if you wish to SSH into the master/nodes once the infra is up.
           
-          //appimage variable will be passed into the vproappdep.yml file and referenced as {{ .Values.appimage}}
-          // when Jenkinspipeline invokes helm command to provison the k8s cluster.
+        //   //appimage variable will be passed into the vproappdep.yml file and referenced as {{ .Values.appimage}}
+        //   // when Jenkinspipeline invokes helm command to provison the k8s cluster.
           
-          //created namespace as prod with kubectl create namespace prod
-          // charts will be deployed in prod namespace.
+        //   //created namespace as prod with kubectl create namespace prod
+        //   // charts will be deployed in prod namespace.
             
-          steps {
-            // script {
-            //   sh "kubectl delete namespace prod || exit 0"
-            //   //sh "kubectl create namespace prod || exit 0"
-            //   //returnStatus: true
-            //   // command || true // this exits with code 1 (true)
-            //   //command || exit 0
-            //   //command || false
-            //   //exit 0 regardless of kubectl create namespce prod. If it already exists the script still exits with 0 
-            //   // so Jenkins does not abort the script
-            // }
+        //   steps {
+        //     // script {
+        //     //   sh "kubectl delete namespace prod || exit 0"
+        //     //   //sh "kubectl create namespace prod || exit 0"
+        //     //   //returnStatus: true
+        //     //   // command || true // this exits with code 1 (true)
+        //     //   //command || exit 0
+        //     //   //command || false
+        //     //   //exit 0 regardless of kubectl create namespce prod. If it already exists the script still exits with 0 
+        //     //   // so Jenkins does not abort the script
+        //     // }
 
-            // script {
-            //   // do the same for the create namespace. If this is a second run the namespace will already be there 
-            //   // this will throw an Already Exists error and the shell script will exit with 1. Force it to exit with 0
-            //   sh "kubectl create namespace prod || exit 0"
-            // }
+        //     // script {
+        //     //   // do the same for the create namespace. If this is a second run the namespace will already be there 
+        //     //   // this will throw an Already Exists error and the shell script will exit with 1. Force it to exit with 0
+        //     //   sh "kubectl create namespace prod || exit 0"
+        //     // }
 
-            // change the above kubectl create block to a try-catch  block so error is shown in jenkins log
-            // "kubectl create namespace prod || exit 0"
-            // the || exit 0 is no longer needed. If there is an error (1) the error will print out but the script will NOT abort the pipeline
-            script { 
+        //     // change the above kubectl create block to a try-catch  block so error is shown in jenkins log
+        //     // "kubectl create namespace prod || exit 0"
+        //     // the || exit 0 is no longer needed. If there is an error (1) the error will print out but the script will NOT abort the pipeline
+        //     script { 
 
-              try { 
-                sh "kubectl create namespace prod"
-              }    
-              catch (e) { 
-                    echo "An error occurred: ${e}" 
-              } 
-            } 
+        //       try { 
+        //         sh "kubectl create namespace prod"
+        //       }    
+        //       catch (e) { 
+        //             echo "An error occurred: ${e}" 
+        //       } 
+        //     } 
             
 
-            sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
-          }
-        }
+        //     sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
+        //   }
+        // }
     }
     //Stages block end
 
