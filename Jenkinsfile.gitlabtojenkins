@@ -184,7 +184,7 @@ pipeline {
                 echo "An error occurred: ${e}"  
                 sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
                 sleep 20    
-                throw new Exception("exit stage and proceed to helm deployment; cluster is already present")      
+     
               } 
 
 
