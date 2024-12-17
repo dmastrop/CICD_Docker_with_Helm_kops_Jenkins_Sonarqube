@@ -3,6 +3,7 @@
 // If FAILURE then danger which is red in slack app
 // Thus we can color code the messages from slack
 // test35 from EC2 controller with no kops cluster. Should create the kops cluster from scratch and deploy
+// test36 from EC2 controller with kops cluster
 
 def COLOR_MAP = [
     'SUCCESS': 'good', 
