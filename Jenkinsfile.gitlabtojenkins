@@ -186,22 +186,22 @@ pipeline {
                 sleep 20    
                 //failure here means that the cluster already exits 
                 // do the helm deployment here
-                stage("kubernetes helm deployment") {
-                  steps {
-                    script { 
+              
 
-                      try { 
-                        sh "kubectl create namespace prod"
-                      }    
-                      catch (e1) { 
-                            echo "An error occurred: ${e1}" 
-                      } 
-                    } 
-                    
+                script { 
 
-                    sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
-                  }
-                }
+                  try { 
+                    sh "kubectl create namespace prod"
+                  }    
+                  catch (e1) { 
+                        echo "An error occurred: ${e1}" 
+                  } 
+                } 
+                
+
+                sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
+                  
+                
               } 
 
 
