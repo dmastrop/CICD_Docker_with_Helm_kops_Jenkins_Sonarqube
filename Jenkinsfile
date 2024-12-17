@@ -160,6 +160,95 @@ pipeline {
 
 
 
+
+
+        //Copy over the Jenkinsfile.gitlabtojuenkins kops and helm code block stage to this file and test with github Jenkins pipeline
+        //Comment out the rest of the kops/helm code below as it is no longer necessary
+        stage('Kops setup and helm kubernetes deployment') {
+          agent { label 'KOPS' }
+          steps {
+            script {
+              try {
+                sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14 --name=kops-project14.holinessinloveofchrist.com" 
+              }  
+              catch (e) { 
+                echo "An error occurred: ${e}" 
+              }
+
+              try {
+                //always run the kops create cluster. This will indicate if the cluster is already up and running or if it has
+                //not been created
+                sh "kops create cluster --name=kops-project14.holinessinloveofchrist.com \
+--state=s3://vprofile-kops-s3-state-project14 --zones=us-east-1a,us-east-1b \
+--node-count=2 --node-size=t3.small --master-size=t3.medium --dns-zone=kops-project14.holinessinloveofchrist.com \
+--node-volume-size=8 --master-volume-size=8 --ssh-public-key=~/.ssh/kops-key-project14.pub"
+                sleep 30
+              }  
+              catch (e) { 
+                echo "An error occurred: ${e}"  
+                sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
+                sleep 20    
+                //failure here means that the cluster already exits 
+                // do the helm deployment here
+              
+
+                script { 
+
+                  try { 
+                    sh "kubectl create namespace prod"
+                  }    
+                  catch (e1) { 
+                        echo "An error occurred: ${e1}" 
+                  } 
+                } 
+                
+
+                sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
+                //exit this stage but keep currentBuild.result success to continue the pipeline. The return will exit this stage as required
+                //we do not want to execute the kops update cluster command in this case.
+                currentBuild.result = 'SUCCESS'
+                return
+
+                
+              } 
+
+
+
+              try {
+                sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
+                sleep 360
+                //deploy helm chart on new cluster only if it has not already been deployed as this takes a lot of time
+                // It will only reach this part of the stage if the cluster has not been deployed due to the "return" in the previous try/catch above
+                script { 
+
+                  try { 
+                    sh "kubectl create namespace prod"
+                  }    
+                  catch (e1) { 
+                        echo "An error occurred: ${e1}" 
+                  } 
+                } 
+                
+                sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
+              }  
+              catch (e) { 
+                echo "An error occurred: ${e}"                
+              } 
+
+
+
+              try {
+                sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
+                sleep 20
+              }  
+              catch (e) { 
+                echo "An error occurred: ${e}"                
+              } 
+     
+            }
+          }
+        }        
+
         //Try to automate the kops setup by putting in a large delay in the shell script after each command. Otherwise
         //write code for the kops validate cluster command and parse out if up or not
         stage('Kops setup') {
