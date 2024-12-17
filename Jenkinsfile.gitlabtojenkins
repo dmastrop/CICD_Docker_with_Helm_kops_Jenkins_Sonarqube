@@ -185,7 +185,23 @@ pipeline {
                 sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
                 sleep 20    
                 //failure here means that the cluster already exits 
-                sh "exit 1"
+                // do the helm deployment here
+                stage("kubernetes helm deployment") {
+                  steps {
+                    script { 
+
+                      try { 
+                        sh "kubectl create namespace prod"
+                      }    
+                      catch (e) { 
+                            echo "An error occurred: ${e}" 
+                      } 
+                    } 
+                    
+
+                    sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
+                  }
+                }
               } 
 
 
