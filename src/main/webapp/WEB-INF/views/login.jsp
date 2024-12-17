@@ -14,7 +14,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>LOGIN edit post kops changes</title>
+    <title>LOGIN</title>
 
     <link href="${contextPath}/resources/css/bootstrap.min.css" rel="stylesheet">
     <link href="${contextPath}/resources/css/common.css" rel="stylesheet">
@@ -55,7 +55,7 @@
                             </ul>
                             <div class="navbar-collapse navbar-right collapse">
 	                            <ul class="nav navbar-nav">
-	                        	 <li><a href="${contextPath}/login">LOGIN</a></li>
+	                        	 <li><a href="${contextPath}/login">LOGIN kops</a></li>
 	                        	 <li><a href="${contextPath}/registration">SIGN UP</a></li>
 	                       	 	</ul>
                             </div>
@@ -71,7 +71,7 @@
 <div class="container">
 	
     <form method="POST" action="${contextPath}/login" class="form-signin">
-        <h2 class="form-heading" align="center"> LOGIN </h2>
+        <h2 class="form-heading" align="center"> LOGIN kops </h2>
 		<img  class="logo" src="${contextPath}/resources/Images/visualpathlogo3.png" />
         <div class="form-group ${error != null ? 'has-error' : ''}">
             <span>${message}</span>
@@ -80,7 +80,7 @@
             <span>${error}</span>
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
-            <button class="btn btn-custom-LOGIN btn-lg  btn-block" type="submit">LOGIN</button>
+            <button class="btn btn-custom-LOGIN btn-lg  btn-block" type="submit">LOGIN kops</button>
             <h4 class="text-center"><a href="${contextPath}/registration">Create an account</a></h4>
         </div>
 
