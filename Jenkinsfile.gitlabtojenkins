@@ -193,8 +193,8 @@ pipeline {
                       try { 
                         sh "kubectl create namespace prod"
                       }    
-                      catch (e) { 
-                            echo "An error occurred: ${e}" 
+                      catch (e1) { 
+                            echo "An error occurred: ${e1}" 
                       } 
                     } 
                     
