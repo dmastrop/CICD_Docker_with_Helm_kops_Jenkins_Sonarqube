@@ -159,59 +159,60 @@ pipeline {
           }
         }
 
-//         //Try to automate the kops setup by putting in a large delay in the shell script after each command. Otherwise
-//         //write code for the kops validate cluster command and parse out if up or not
-//         stage('Kops setup') {
-//             agent { label 'KOPS' }
-//             steps {
-//                 sh "kops create cluster --name=kops-project14.holinessinloveofchrist.com \
-// --state=s3://vprofile-kops-s3-state-project14 --zones=us-east-1a,us-east-1b \
-// --node-count=2 --node-size=t3.small --master-size=t3.medium --dns-zone=kops-project14.holinessinloveofchrist.com \
-// --node-volume-size=8 --master-volume-size=8 --ssh-public-key=~/.ssh/kops-key-project14.pub"
-//                 sleep 30
-//                 sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
-//                 sleep 360
-//                 sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
-//                 sleep 20
-//             }
-//         }
-
-
-
         //Try to automate the kops setup by putting in a large delay in the shell script after each command. Otherwise
         //write code for the kops validate cluster command and parse out if up or not
         stage('Kops setup') {
             agent { label 'KOPS' }
             steps {
-                script {
-                
-                    sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14 --name=kops-project14.holinessinloveofchrist.com &> output.txt"
-                    sh "last_line=${tail -n 1 output.txt}"
-                    sh "echo $last_line"
-                    sh "export validatekops="$last_line""
-                    sh "echo $validatekops"
-                    
-
-                    if ($validatekops == "Your cluster kops-project14.holinessinloveofchrist.com is ready") {
-                        exit 0
-
-                    
-                    } else {
-                        sh "kops create cluster --name=kops-project14.holinessinloveofchrist.com \
+                   sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14 --name=kops-project14.holinessinloveofchrist.com" 
+                sh "kops create cluster --name=kops-project14.holinessinloveofchrist.com \
 --state=s3://vprofile-kops-s3-state-project14 --zones=us-east-1a,us-east-1b \
 --node-count=2 --node-size=t3.small --master-size=t3.medium --dns-zone=kops-project14.holinessinloveofchrist.com \
 --node-volume-size=8 --master-volume-size=8 --ssh-public-key=~/.ssh/kops-key-project14.pub"
-                        sleep 30
-
-                        sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
-                        sleep 360
-
-                        sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
-                        sleep 20
-                    }
-                }
+                sleep 30
+                sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
+                sleep 360
+                sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
+                sleep 20
             }
         }
+
+
+
+//         //Try to automate the kops setup by putting in a large delay in the shell script after each command. Otherwise
+//         //write code for the kops validate cluster command and parse out if up or not
+//         stage('Kops setup') {
+//             agent { label 'KOPS' }
+//             steps {
+//                 script {
+                
+//                     sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14 --name=kops-project14.holinessinloveofchrist.com &> output.txt"
+//                     sh "last_line=${tail -n 1 output.txt}"
+//                     sh "echo $last_line"
+//                     sh "export validatekops="$last_line""
+//                     sh "echo $validatekops"
+                    
+
+//                     if ($validatekops == "Your cluster kops-project14.holinessinloveofchrist.com is ready") {
+//                         exit 0
+
+                    
+//                     } else {
+//                         sh "kops create cluster --name=kops-project14.holinessinloveofchrist.com \
+// --state=s3://vprofile-kops-s3-state-project14 --zones=us-east-1a,us-east-1b \
+// --node-count=2 --node-size=t3.small --master-size=t3.medium --dns-zone=kops-project14.holinessinloveofchrist.com \
+// --node-volume-size=8 --master-volume-size=8 --ssh-public-key=~/.ssh/kops-key-project14.pub"
+//                         sleep 30
+
+//                         sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
+//                         sleep 360
+
+//                         sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
+//                         sleep 20
+//                     }
+//                 }
+//             }
+//         }
 
         // KUBERNETES:
         stage('Kubernetes Deploy') {
