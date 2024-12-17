@@ -175,6 +175,8 @@ pipeline {
               }
 
               try {
+                //always run the kops create cluster. This will indicate if the cluster is already up and running or if it has
+                //not been created
                 sh "kops create cluster --name=kops-project14.holinessinloveofchrist.com \
 --state=s3://vprofile-kops-s3-state-project14 --zones=us-east-1a,us-east-1b \
 --node-count=2 --node-size=t3.small --master-size=t3.medium --dns-zone=kops-project14.holinessinloveofchrist.com \
@@ -201,7 +203,8 @@ pipeline {
                 
 
                 sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
-                //exit this stage but keep currentBuild.result success to continue the pipeline
+                //exit this stage but keep currentBuild.result success to continue the pipeline. The return will exit this stage as required
+                //we do not want to execute the kops update cluster command in this case.
                 currentBuild.result = 'SUCCESS'
                 return
 
@@ -305,7 +308,7 @@ pipeline {
         // KUBERNETES:
 
 
-        //Don't need this any longer (part 1)
+        //Don't need this stage any longer. This stage has been incorporated into the kops create stage above(part 1)
         // stage('Kubernetes Deploy') {
 	      //   agent { label 'KOPS' }
 
