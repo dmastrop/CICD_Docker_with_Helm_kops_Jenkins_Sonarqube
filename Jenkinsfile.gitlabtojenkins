@@ -162,7 +162,7 @@ pipeline {
 
         //Try to automate the kops setup by putting in a large delay in the shell script after each command. Otherwise
         //write code for the kops validate cluster command and parse out if up or not
-        stage('Kops setup') {
+        stage('Kops setup and helm kubernetes deployment') {
           agent { label 'KOPS' }
           steps {
             script {
@@ -212,7 +212,8 @@ pipeline {
               try {
                 sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
                 sleep 360
-                //deploy helm chart on new cluster
+                //deploy helm chart on new cluster only if it has not already been deployed as this takes a lot of time
+                // It will only reach this stage if the cluster has not been deployed due to the "return" in the previous try/catch above
                 script { 
 
                   try { 
@@ -301,8 +302,15 @@ pipeline {
 //         }
 
         // KUBERNETES:
-        stage('Kubernetes Deploy') {
-	        agent { label 'KOPS' }
+
+
+        //Don't need this any longer (part 1)
+        // stage('Kubernetes Deploy') {
+	      //   agent { label 'KOPS' }
+
+
+
+
           // the kops-project14-EC2 instance will be configured as a slave node to run the shell command below
           // the label KOPS was used in the Jenkins slave node configuration for the kops-project14-EC2 instance along with a lot of other setup.
           // Using SSH to the master to node connection. Security groups reprovisioned on AWS2.
@@ -326,8 +334,15 @@ pipeline {
           
           //created namespace as prod with kubectl create namespace prod
           // charts will be deployed in prod namespace.
-            
-          steps {
+
+
+
+          //Don't need this any longer (part 2)
+          // steps {
+
+
+
+
             // script {
             //   sh "kubectl delete namespace prod || exit 0"
             //   //sh "kubectl create namespace prod || exit 0"
@@ -348,20 +363,32 @@ pipeline {
             // change the above kubectl create block to a try-catch  block so error is shown in jenkins log
             // "kubectl create namespace prod || exit 0"
             // the || exit 0 is no longer needed. If there is an error (1) the error will print out but the script will NOT abort the pipeline
-            script { 
+            
+            
+            
+            
+            
+            //Don't need this any longer (part 3)
+            // script { 
 
-              try { 
-                sh "kubectl create namespace prod"
-              }    
-              catch (e) { 
-                    echo "An error occurred: ${e}" 
-              } 
-            } 
+            //   try { 
+            //     sh "kubectl create namespace prod"
+            //   }    
+            //   catch (e) { 
+            //         echo "An error occurred: ${e}" 
+            //   } 
+            // } 
             
 
-            sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
-          }
-        }
+        //     sh "helm upgrade --install --force vprofile-stack helm/vprofilecharts --set appimage=${registry}:${BUILD_NUMBER} --namespace prod"
+        //   }
+        // }
+
+
+
+
+
+
 
         
         // notify gitlab which is the trigger to jenkins. Note Jenkins has plugin to communicate to gitlab
