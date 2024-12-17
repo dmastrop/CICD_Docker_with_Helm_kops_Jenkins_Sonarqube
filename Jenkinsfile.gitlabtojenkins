@@ -167,19 +167,42 @@ pipeline {
             script {
               try {
                 sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14 --name=kops-project14.holinessinloveofchrist.com" 
+              }  
+              catch (e) { 
+                echo "An error occurred: ${e}" 
+
+
+              try {
                 sh "kops create cluster --name=kops-project14.holinessinloveofchrist.com \
 --state=s3://vprofile-kops-s3-state-project14 --zones=us-east-1a,us-east-1b \
 --node-count=2 --node-size=t3.small --master-size=t3.medium --dns-zone=kops-project14.holinessinloveofchrist.com \
 --node-volume-size=8 --master-volume-size=8 --ssh-public-key=~/.ssh/kops-key-project14.pub"
                 sleep 30
+              }  
+              catch (e) { 
+                echo "An error occurred: ${e}"                
+              } 
+
+
+
+              try {
                 sh "kops update cluster --name=kops-project14.holinessinloveofchrist.com --state=s3://vprofile-kops-s3-state-project14 --yes --admin"
                 sleep 360
+              }  
+              catch (e) { 
+                echo "An error occurred: ${e}"                
+              } 
+
+
+
+              try {
                 sh "kops validate cluster --state=s3://vprofile-kops-s3-state-project14"
                 sleep 20
               }  
               catch (e) { 
-                echo "An error occurred: ${e}" 
+                echo "An error occurred: ${e}"                
               } 
+
             }
           }
         }
