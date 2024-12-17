@@ -267,6 +267,16 @@ So basically bi-directional tokens are used for bidirectional webhook gitlab to 
 
 For project 18 gitlab to jenkins extension (see other repo) try using Gitlab integration instead of a gitlab hook for the gitlab to jenkins communication.  The rest of the configuration should be the same as that used here.
 
+The project20 Jenkinsfile and Jenkinsfile.gitlabtojenkins script was significantly updated to incorporate the kops bringup of the cluster, if it is not already up.   If it is up, then the kops update cluster will not be re-run to save time.  The logic is to check the status of the kubernetes kops cluster by running the kops create cluster command. Using several try and catch(error) structures, if the command errors out that means that the cluster is already up and helm can be re-deployed with latest source code.  Then since the state is in a catch error block, set the build to SUCCESS and return so that the current stage is exited with success and the next stage can be executed. Otherwise the pipeline will abort.
+The code to do this is in the catch error block:
+  currentBuild.result = 'SUCCESS'
+  return
+
+If the command kops create cluster does not error out the script proceeds to the next try and catch block to do the kops update cluster and bring up the kops cluster. After that the helm is deployed and then the state proceeds to the next stage.
+
+
+
+
 ## Prerequisites
 - JDK 1.8 or later
 - Maven 3 or later
