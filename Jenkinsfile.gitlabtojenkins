@@ -170,7 +170,7 @@ pipeline {
               }  
               catch (e) { 
                 echo "An error occurred: ${e}" 
-
+              }
 
               try {
                 sh "kops create cluster --name=kops-project14.holinessinloveofchrist.com \
@@ -202,7 +202,7 @@ pipeline {
               catch (e) { 
                 echo "An error occurred: ${e}"                
               } 
-
+     
             }
           }
         }
