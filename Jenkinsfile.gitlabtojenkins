@@ -5,6 +5,8 @@
 // test35 from EC2 controller with no kops cluster. Should create the kops cluster from scratch and deploy
 // test36 from EC2 controller with kops cluster
 //test37 from VSCode with no kops cluster
+// test from VSCode to gitlab with kops cluster up and running
+
 
 def COLOR_MAP = [
     'SUCCESS': 'good', 
