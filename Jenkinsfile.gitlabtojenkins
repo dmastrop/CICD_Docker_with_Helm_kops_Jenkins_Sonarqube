@@ -6,7 +6,7 @@
 // test36 from EC2 controller with kops cluster
 //test37 from VSCode with no kops cluster
 // test from VSCode to gitlab with kops cluster up and running
-
+//test with VSCode to gitlab with kops cluster not up. The jenkinsfile will create the kops cluster from scratch and then deploy the microservices app via helm
 
 def COLOR_MAP = [
     'SUCCESS': 'good', 
