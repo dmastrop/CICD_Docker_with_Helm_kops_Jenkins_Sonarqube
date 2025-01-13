@@ -274,7 +274,7 @@ The code to do this is in the catch error block:
 
 If the command kops create cluster does not error out the script proceeds to the next try and catch block to do the kops update cluster and bring up the kops cluster. After that the helm is deployed and then the state proceeds to the next stage.
 
-## The complete code block for this logic is below and can be found in the Jenkinsfile.gitlabtojenkins file in the following stage:
+## The code block for this logic can be found in the Jenkinsfile.gitlabtojenkins file in the following stage:
 
         //Try to automate the kops setup by putting in a large delay in the shell script after each command. Otherwise
         //write code for the kops validate cluster command and parse out if up or not
